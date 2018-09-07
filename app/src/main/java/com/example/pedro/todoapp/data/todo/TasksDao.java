@@ -1,13 +1,12 @@
 package com.example.pedro.todoapp.data.todo;
 
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.example.pedro.todoapp.data.model.Task;
+import com.example.pedro.todoapp.data.entity.Task;
 
 import java.util.List;
 import io.reactivex.Flowable;

@@ -54,6 +54,6 @@ dependencies {
     //Animation
     implementation 'com.airbnb.android:lottie:2.6.0-beta19'
 
-    implementation 'com.thoughtbot:expandablerecyclerview:1.3'
-
+    //Fernando Cejas Arrow
+    implementation 'com.fernandocejas:arrow:1.0.0'
 }

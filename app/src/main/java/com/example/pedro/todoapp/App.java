@@ -5,7 +5,7 @@ import android.app.Application;
 import android.support.v4.app.Fragment;
 
 
-import com.example.pedro.todoapp.di.DaggerAppComponent;
+import com.example.pedro.todoapp.view.di.DaggerAppComponent;
 
 import javax.inject.Inject;
 

@@ -5,7 +5,7 @@
     android:id="@+id/todo_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tasks.TasksFragment">
+    tools:context=".view.fragment.TasksFragment">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/tasks_fab"
