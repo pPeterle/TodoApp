@@ -1,4 +1,4 @@
-package com.example.pedro.todoapp.data.todo;
+package com.example.pedro.todoapp.data.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
@@ -9,6 +9,8 @@ import android.arch.persistence.room.Update;
 import com.example.pedro.todoapp.data.entity.Task;
 
 import java.util.List;
+
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
 @Dao

@@ -1,10 +1,11 @@
-package com.example.pedro.todoapp.data.todo;
+package com.example.pedro.todoapp.data.db;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.example.pedro.todoapp.data.dao.TasksDao;
 import com.example.pedro.todoapp.data.entity.Task;
 
 @Database(entities = Task.class, version = 1)

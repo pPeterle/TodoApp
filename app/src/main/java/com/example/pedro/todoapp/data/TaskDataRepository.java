@@ -1,14 +1,19 @@
 package com.example.pedro.todoapp.data;
 
+import android.util.Log;
+
 import com.example.pedro.todoapp.data.entity.Task;
-import com.example.pedro.todoapp.data.todo.TasksDao;
-import com.example.pedro.todoapp.domain.TaskRepository;
+import com.example.pedro.todoapp.data.dao.TasksDao;
+import com.example.pedro.todoapp.domain.repository.TaskRepository;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 
 @Singleton
@@ -22,13 +27,19 @@ public class TaskDataRepository implements TaskRepository {
     }
 
     @Override
-    public void insertTask(Task task) {
-        tasksDao.insertTask(task);
+    public Completable insertTask(Task task) {
+        return Completable.defer(() -> {
+                tasksDao.insertTask(task);
+                return Completable.complete();
+        });
     }
 
     @Override
-    public void updateTask(Task task) {
-        tasksDao.updateTask(task);
+    public Completable updateTask(Task task) {
+        return Completable.defer(() -> {
+            tasksDao.updateTask(task);
+            return Completable.complete();
+        });
     }
 
     @Override
@@ -47,12 +58,18 @@ public class TaskDataRepository implements TaskRepository {
     }
 
     @Override
-    public void updateCompleted(String id, boolean completed) {
-        tasksDao.updateCompleted(id, completed);
+    public Completable updateCompleted(String id, boolean completed) {
+        return Completable.defer(() -> {
+            tasksDao.updateCompleted(id, completed);
+            return Completable.complete();
+        });
     }
 
     @Override
-    public void deleteTaskById(String id) {
-        tasksDao.deleteTaskById(id);
+    public Completable deleteTaskById(String id) {
+        return Completable.defer(() -> {
+            tasksDao.deleteTaskById(id);
+            return Completable.complete();
+        });
     }
 }

@@ -2,6 +2,7 @@ package com.example.pedro.todoapp.view.fragment;
 
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import com.fernandocejas.arrow.collections.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -46,7 +49,7 @@ public class TasksFragment extends Fragment {
     private List<TaskItem> allTasks = new ArrayList<>();
 
     @Inject
-    ViewModelFactory mViewModelFactory;
+    ViewModelProvider.Factory mViewModelFactory;
 
     public static TasksFragment newInstance() {
         return new TasksFragment();
@@ -66,12 +69,7 @@ public class TasksFragment extends Fragment {
         mRecyclerTasks = view.findViewById(R.id.todo_recyclerTasks);
         mFab = view.findViewById(R.id.tasks_fab);
 
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                buildAlertDialog();
-            }
-        });
+        mFab.setOnClickListener(fab -> buildAlertDialog());
 
         setupRecyclerView();
 
@@ -87,21 +85,15 @@ public class TasksFragment extends Fragment {
 
         getLifecycle().addObserver(mViewModel);
 
-        mViewModel.getViewState().observe(this, new Observer<ViewState<List<TaskItem>>>() {
-            @Override
-            public void onChanged(@Nullable ViewState<List<TaskItem>> viewState) {
-                if (viewState != null) {
-                    handleState(viewState, false);
-                }
+        mViewModel.getViewState().observe(this, viewState -> {
+            if (viewState != null) {
+                handleState(viewState, false);
             }
         });
 
-        mViewModel.getViewStateCompleted().observe(this, new Observer<ViewState<List<TaskItem>>>() {
-            @Override
-            public void onChanged(@Nullable ViewState<List<TaskItem>> viewState) {
-                if (viewState != null) {
-                    handleState(viewState, true);
-                }
+        mViewModel.getViewStateCompleted().observe(this, viewState -> {
+            if (viewState != null) {
+                handleState(viewState, true);
             }
         });
     }
@@ -136,13 +128,10 @@ public class TasksFragment extends Fragment {
     private void setupRecyclerView() {
         mAdapter = new TasksRecyclerAdapter(allTasks);
 
-        mAdapter.setOnItemClickListener(new TasksRecyclerAdapter.OnTaskCompletedListener() {
-            @Override
-            public void onTaskCompleted(int pos) {
-                mViewModel.updateTaskCompleted(allTasks.get(pos));
-                allTasks.remove(pos);
-                mAdapter.notifyItemRemoved(pos);
-            }
+        mAdapter.setOnItemClickListener(pos -> {
+            mViewModel.updateTaskCompleted(allTasks.get(pos));
+            allTasks.remove(pos);
+            mAdapter.notifyItemRemoved(pos);
         });
 
         mRecyclerTasks.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -155,13 +144,10 @@ public class TasksFragment extends Fragment {
         final TextInputLayout textInputLayout = layout.findViewById(R.id.add_task_title);
         builder.setTitle("Add task");
         builder.setView(layout);
-        builder.setPositiveButton("Add task", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String title = textInputLayout.getEditText().getText().toString();
-                mViewModel.addTodo(title);
-                dialogInterface.dismiss();
-            }
+        builder.setPositiveButton("Add task", (dialogInterface, i) -> {
+            String title = Objects.requireNonNull(textInputLayout.getEditText()).getText().toString();
+            mViewModel.addTodo(title);
+            dialogInterface.dismiss();
         });
         builder.create();
         builder.show();

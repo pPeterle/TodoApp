@@ -1,4 +1,4 @@
-package com.example.pedro.todoapp.view.di;
+package com.example.pedro.todoapp.view.di.module;
 
 import com.example.pedro.todoapp.view.fragment.TasksFragment;
 

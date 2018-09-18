@@ -39,7 +39,7 @@ public final class TaskItem {
         return Objects.hash(mTask, mBackground, mTextColor);
     }
 
-    public Task getmTask() {
+    public Task getTask() {
         return mTask;
     }
 

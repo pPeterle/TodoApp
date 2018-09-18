@@ -9,7 +9,12 @@ import android.arch.lifecycle.ViewModel;
 import android.graphics.Color;
 
 import com.example.pedro.todoapp.R;
-import com.example.pedro.todoapp.domain.TaskRepository;
+import com.example.pedro.todoapp.domain.interactor.DefaultCompleted;
+import com.example.pedro.todoapp.domain.interactor.task.FilterTasks;
+import com.example.pedro.todoapp.domain.interactor.task.GetAllTasks;
+import com.example.pedro.todoapp.domain.interactor.task.InsertTask;
+import com.example.pedro.todoapp.domain.interactor.task.RemoveTask;
+import com.example.pedro.todoapp.domain.interactor.task.UpdateTaskCompleted;
 import com.example.pedro.todoapp.presentation.ViewState;
 import com.example.pedro.todoapp.data.entity.Task;
 import com.example.pedro.todoapp.presentation.model.TaskItem;
@@ -17,58 +22,69 @@ import com.example.pedro.todoapp.presentation.model.TaskItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
+import javax.inject.Inject;
+
+import io.reactivex.observers.DisposableObserver;
 
 
 public class TasksViewModel extends ViewModel implements LifecycleObserver {
 
-    private final TaskRepository mTaskRepository;
+    private final GetAllTasks getAllTasks;
+    private final UpdateTaskCompleted updateTask;
+    private final RemoveTask removeTask;
+    private final InsertTask insertTask;
 
     private MutableLiveData<ViewState<List<TaskItem>>> state;
     private MutableLiveData<ViewState<List<TaskItem>>> stateCompleted;
 
-    private List<TaskItem> taskList = new ArrayList<>();
-    private List<TaskItem> taskListCompleted = new ArrayList<>();
+    private FilterTasks<Task> taskList = new FilterTasks();
 
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-
-    public TasksViewModel(TaskRepository TaskRepository) {
-        this.mTaskRepository = TaskRepository;
+    @Inject
+    public TasksViewModel(GetAllTasks getAllTasks,
+                          InsertTask insertTask,
+                          RemoveTask removeTask,
+                          UpdateTaskCompleted updateTaskCompleted) {
+        this.getAllTasks = getAllTasks;
+        this.insertTask = insertTask;
+        this.removeTask = removeTask;
+        this.updateTask = updateTaskCompleted;
         state = new MutableLiveData<>();
         stateCompleted = new MutableLiveData<>();
     }
 
     private void fetchTasks() {
-        mCompositeDisposable.add(mTaskRepository.getTasksByCompleted(false)
-                .map(new Function<List<Task>, List<TaskItem>>() {
-                    @Override
-                    public List<TaskItem> apply(List<Task> list) throws Exception {
-                        List<TaskItem> taskItems = new ArrayList<>();
-                        for (Task task : list) {
-                            taskItems.add(constructTaskItem(task));
-                        }
-                        return taskItems;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<TaskItem>>() {
-                    @Override
-                    public void accept(List<TaskItem> list) {
-                        list.removeAll(taskList);
-                        state.postValue(new ViewState<>(list, ViewState.Status.SUCCESS));
-                        taskList.addAll(list);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        state.postValue((new ViewState<List<TaskItem>>(throwable, ViewState.Status.ERROR)));
-                    }
-                }));
+        getAllTasks.execute( null, new DisposableObserver<List<Task>>() {
+            @Override
+            public void onNext(List<Task> list) {
+                handleOnNext(taskList.getDifferentItens(list));
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                state.postValue((new ViewState(throwable, ViewState.Status.ERROR)));
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+    }
+
+    private void handleOnNext(List<Task> list) {
+        List<TaskItem> tasks = new ArrayList<>();
+        List<TaskItem> tasksCompleted = new ArrayList<>();
+
+        for (Task task : list) {
+            TaskItem taskItem = constructTaskItem(task);
+
+            if (taskItem.getTask().isCompleted()) {
+                tasksCompleted.add(taskItem);
+            } else {
+                tasks.add(taskItem);
+            }
+        }
+
+        state.postValue(new ViewState<>(tasks, ViewState.Status.SUCCESS));
+        stateCompleted.postValue(new ViewState<>(tasksCompleted, ViewState.Status.SUCCESS));
     }
 
     private TaskItem constructTaskItem(Task task) {
@@ -79,55 +95,26 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
         }
     }
 
-    private void fetchTasksCompleted() {
-        mCompositeDisposable.add(mTaskRepository.getTasksByCompleted(true)
-                .map(new Function<List<Task>, List<TaskItem>>() {
-                    @Override
-                    public List<TaskItem> apply(List<Task> list) throws Exception {
-                        List<TaskItem> taskItems = new ArrayList<>();
-                        for (Task task : list) {
-                            taskItems.add(constructTaskItem(task));
-                        }
-                        return taskItems;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<TaskItem>>() {
-                    @Override
-                    public void accept(List<TaskItem> list) {
-                        list.removeAll(taskListCompleted);
-                        stateCompleted.postValue(new ViewState<>(list, ViewState.Status.SUCCESS));
-                        taskListCompleted.addAll(list);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        stateCompleted.postValue((new ViewState<List<TaskItem>>(throwable, ViewState.Status.ERROR)));
-                    }
-                }));
-    }
-
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     public void fetchIfNeeded() {
         if (state.getValue() == null) {
             fetchTasks();
-            fetchTasksCompleted();
         }
     }
 
     public void updateTaskCompleted(TaskItem taskItem) {
-        if (taskItem.getmTask().isCompleted()) {
-            mTaskRepository.updateCompleted(String.valueOf(taskItem.getmTask().getId()), false);
-            taskListCompleted.remove(taskItem);
+        if (taskItem.getTask().isCompleted()) {
+            removeTask.execute(new DefaultCompleted(), new RemoveTask.Params(String.valueOf(taskItem.getTask().getId())));
+            addTodo(taskItem.getTask().getTitle());
+            taskList.itemRemoved(taskItem.getTask());
         } else {
-            mTaskRepository.updateCompleted(String.valueOf(taskItem.getmTask().getId()), true);
-            taskList.remove(taskItem);
+            updateTask.execute(new DefaultCompleted(), UpdateTaskCompleted.Params.forTask(String.valueOf(taskItem.getTask().getId())));
+            taskList.itemRemoved(taskItem.getTask());
         }
     }
 
     public void addTodo(String text) {
-        mTaskRepository.insertTask(new Task(text, false));
+        insertTask.execute(new DefaultCompleted(), new InsertTask.Params(new Task(text, false)));
     }
 
     public LiveData<ViewState<List<TaskItem>>> getViewState() {
@@ -141,6 +128,9 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     @Override
     protected void onCleared() {
         super.onCleared();
-        mCompositeDisposable.dispose();
+        insertTask.dispose();
+        getAllTasks.dispose();
+        updateTask.dispose();
+        removeTask.dispose();
     }
 }

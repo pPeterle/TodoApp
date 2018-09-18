@@ -1,16 +1,17 @@
-package com.example.pedro.todoapp.domain;
+package com.example.pedro.todoapp.domain.repository;
 
 import com.example.pedro.todoapp.data.entity.Task;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
 public interface TaskRepository {
 
-    void insertTask(Task task);
+    Completable insertTask(Task task);
 
-    void updateTask(Task task);
+    Completable updateTask(Task task);
 
     Flowable<List<Task>> getAllTasks();
 
@@ -18,7 +19,7 @@ public interface TaskRepository {
 
     Flowable<Task> getTaskById(String id);
 
-    void updateCompleted(String id, boolean completed);
+    Completable updateCompleted(String id, boolean completed);
 
-    void deleteTaskById(String id);
+    Completable deleteTaskById(String id);
 }

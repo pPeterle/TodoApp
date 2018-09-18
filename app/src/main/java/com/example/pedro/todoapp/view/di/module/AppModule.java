@@ -1,12 +1,14 @@
-package com.example.pedro.todoapp.view.di;
+package com.example.pedro.todoapp.view.di.module;
 
 import android.app.Application;
 import android.content.Context;
 
 import com.example.pedro.todoapp.data.TaskDataRepository;
-import com.example.pedro.todoapp.domain.TaskRepository;
-import com.example.pedro.todoapp.data.todo.TasksDao;
-import com.example.pedro.todoapp.data.todo.TodoDatabase;
+import com.example.pedro.todoapp.domain.executor.PostExecutionThread;
+import com.example.pedro.todoapp.domain.repository.TaskRepository;
+import com.example.pedro.todoapp.data.dao.TasksDao;
+import com.example.pedro.todoapp.data.db.TodoDatabase;
+import com.example.pedro.todoapp.presentation.UIThread;
 
 import dagger.Module;
 import dagger.Provides;
@@ -27,5 +29,10 @@ public class AppModule {
     @Provides
     public TaskRepository provideDataSource(TaskDataRepository taskDataRepository) {
         return taskDataRepository;
+    }
+
+    @Provides
+    public PostExecutionThread providePostExecutionThread(UIThread uiThread) {
+        return uiThread;
     }
 }

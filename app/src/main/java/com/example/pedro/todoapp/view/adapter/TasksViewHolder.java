@@ -30,10 +30,10 @@ public class TasksViewHolder extends RecyclerView.ViewHolder implements Animator
     }
 
     public void bind(final TaskItem taskItem, TasksRecyclerAdapter.OnTaskCompletedListener listener) {
-        title.setText(taskItem.getmTask().getTitle());
+        title.setText(taskItem.getTask().getTitle());
         title.setTextColor(taskItem.getTextColor());
         title.setBackgroundResource(taskItem.getBackgroundColor());
-        animation.setFrame(lottieContainer.getAnimationFrame(taskItem.getmTask()));
+        animation.setFrame(lottieContainer.getAnimationFrame(taskItem.getTask()));
         this.listener = listener;
 
     }
