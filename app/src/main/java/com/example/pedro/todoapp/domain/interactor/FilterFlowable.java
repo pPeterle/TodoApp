@@ -1,9 +1,9 @@
-package com.example.pedro.todoapp.domain.interactor.task;
+package com.example.pedro.todoapp.domain.interactor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilterTasks<T> {
+public class FilterFlowable<T> {
 
     private List<T> list = new ArrayList<>();
 

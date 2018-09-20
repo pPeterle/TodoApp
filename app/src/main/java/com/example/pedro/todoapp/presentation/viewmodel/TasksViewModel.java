@@ -1,16 +1,16 @@
 package com.example.pedro.todoapp.presentation.viewmodel;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ViewModel;
 import android.graphics.Color;
 
 import com.example.pedro.todoapp.R;
 import com.example.pedro.todoapp.domain.interactor.DefaultCompleted;
-import com.example.pedro.todoapp.domain.interactor.task.FilterTasks;
+import com.example.pedro.todoapp.domain.interactor.FilterFlowable;
 import com.example.pedro.todoapp.domain.interactor.task.GetAllTasks;
 import com.example.pedro.todoapp.domain.interactor.task.InsertTask;
 import com.example.pedro.todoapp.domain.interactor.task.RemoveTask;
@@ -37,7 +37,7 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     private MutableLiveData<ViewState<List<TaskItem>>> state;
     private MutableLiveData<ViewState<List<TaskItem>>> stateCompleted;
 
-    private FilterTasks<Task> taskList = new FilterTasks();
+    private FilterFlowable<Task> taskList = new FilterFlowable();
 
     @Inject
     public TasksViewModel(GetAllTasks getAllTasks,

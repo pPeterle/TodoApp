@@ -1,7 +1,7 @@
 package com.example.pedro.todoapp.view.di.module;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.pedro.todoapp.ViewModelFactory;
 import com.example.pedro.todoapp.presentation.viewmodel.TasksViewModel;

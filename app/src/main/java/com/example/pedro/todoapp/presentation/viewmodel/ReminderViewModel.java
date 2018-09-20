@@ -1,7 +1,7 @@
 package com.example.pedro.todoapp.presentation.viewmodel;
 
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 public class ReminderViewModel extends ViewModel {
     // TODO: Implement the ViewModel

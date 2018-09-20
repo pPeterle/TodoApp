@@ -1,7 +1,7 @@
 package com.example.pedro.todoapp.presentation.model;
 
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
 
 import com.example.pedro.todoapp.data.entity.Task;
 
