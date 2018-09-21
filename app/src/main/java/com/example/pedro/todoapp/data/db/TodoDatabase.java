@@ -8,7 +8,7 @@ import android.content.Context;
 import com.example.pedro.todoapp.data.dao.TasksDao;
 import com.example.pedro.todoapp.data.entity.Task;
 
-@Database(entities = Task.class, version = 1)
+@Database(entities = Task.class, version = 2)
 public abstract class TodoDatabase extends RoomDatabase {
 
     private static TodoDatabase INSTANCE;

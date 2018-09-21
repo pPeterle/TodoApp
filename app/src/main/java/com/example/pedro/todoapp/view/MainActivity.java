@@ -3,6 +3,8 @@ package com.example.pedro.todoapp.view;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +16,11 @@ import com.example.pedro.todoapp.view.fragment.ListFragment;
 import com.example.pedro.todoapp.view.fragment.NoteFragment;
 import com.example.pedro.todoapp.view.fragment.ReminderFragment;
 import com.example.pedro.todoapp.view.fragment.TasksFragment;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 
 import javax.inject.Inject;
 
@@ -24,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
+
+    private Drawer mDrawer;
+    private Toolbar mToolbar;
 
     private HomeFragment homeFragment = HomeFragment.newInstance();
     private TasksFragment tasksFragment = TasksFragment.newInstance();
@@ -65,8 +75,21 @@ public class MainActivity extends AppCompatActivity {
 
         switchFragment(homeFragment);
 
+        mToolbar = findViewById(R.id.main_toolbar);
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        setSupportActionBar(mToolbar);
+
+        mDrawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(mToolbar)
+                .addDrawerItems(new PrimaryDrawerItem().withName("testando"))
+                .withSelectedItem(-1)
+                .build();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        mDrawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
     }
 
     public void switchFragment(Fragment fragment) {

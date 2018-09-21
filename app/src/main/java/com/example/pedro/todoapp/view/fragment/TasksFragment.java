@@ -33,6 +33,7 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import dagger.android.support.AndroidSupportInjection;
 
 public class TasksFragment extends Fragment {
@@ -127,7 +128,7 @@ public class TasksFragment extends Fragment {
         mAdapter = new TasksRecyclerAdapter(allTasks);
 
         mAdapter.setOnItemClickListener(pos -> {
-            mViewModel.updateTaskCompleted(allTasks.get(pos));
+            mViewModel.updateTaskCompleted(allTasks.get(pos).getTask());
             allTasks.remove(pos);
             mAdapter.notifyItemRemoved(pos);
         });

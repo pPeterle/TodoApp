@@ -5,9 +5,13 @@ import java.util.List;
 
 public class FilterFlowable<T> {
 
-    private List<T> list = new ArrayList<>();
+    private List<T> list;
 
-    public List<T> getDifferentItens(List<T> newList) {
+    public FilterFlowable() {
+        this.list = new ArrayList<>();
+    }
+
+    public List<T> filterList(List<T> newList) {
         newList.removeAll(list);
         list.addAll(newList);
         return newList;

@@ -59,4 +59,7 @@ dependencies {
 
     //Fernando Cejas Arrow
     implementation 'com.fernandocejas:arrow:1.0.0'
+
+    //Material Drawer
+    implementation "com.mikepenz:materialdrawer:6.1.0-rc02"
 }

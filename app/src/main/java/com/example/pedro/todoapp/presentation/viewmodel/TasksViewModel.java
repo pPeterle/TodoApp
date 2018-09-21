@@ -19,6 +19,8 @@ import com.example.pedro.todoapp.presentation.ViewState;
 import com.example.pedro.todoapp.data.entity.Task;
 import com.example.pedro.todoapp.presentation.model.TaskItem;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     private MutableLiveData<ViewState<List<TaskItem>>> state;
     private MutableLiveData<ViewState<List<TaskItem>>> stateCompleted;
 
-    private FilterFlowable<Task> taskList = new FilterFlowable();
+    private FilterFlowable<Task> taskList = new FilterFlowable<>();
 
     @Inject
     public TasksViewModel(GetAllTasks getAllTasks,
@@ -56,12 +58,12 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
         getAllTasks.execute( null, new DisposableObserver<List<Task>>() {
             @Override
             public void onNext(List<Task> list) {
-                handleOnNext(taskList.getDifferentItens(list));
+                handleOnNext(taskList.filterList(list));
             }
 
             @Override
             public void onError(Throwable throwable) {
-                state.postValue((new ViewState(throwable, ViewState.Status.ERROR)));
+                state.postValue((new ViewState<>(throwable, ViewState.Status.ERROR)));
             }
 
             @Override
@@ -69,7 +71,7 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
         });
     }
 
-    private void handleOnNext(List<Task> list) {
+    private void handleOnNext(@NotNull List<Task> list) {
         List<TaskItem> tasks = new ArrayList<>();
         List<TaskItem> tasksCompleted = new ArrayList<>();
 
@@ -87,7 +89,8 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
         stateCompleted.postValue(new ViewState<>(tasksCompleted, ViewState.Status.SUCCESS));
     }
 
-    private TaskItem constructTaskItem(Task task) {
+
+    private TaskItem constructTaskItem(@NotNull Task task) {
         if (task.isCompleted()) {
             return new TaskItem(task, R.drawable.strike, Color.GRAY);
         } else {
@@ -102,14 +105,14 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
         }
     }
 
-    public void updateTaskCompleted(TaskItem taskItem) {
-        if (taskItem.getTask().isCompleted()) {
-            removeTask.execute(new DefaultCompleted(), new RemoveTask.Params(String.valueOf(taskItem.getTask().getId())));
-            addTodo(taskItem.getTask().getTitle());
-            taskList.itemRemoved(taskItem.getTask());
+    public void updateTaskCompleted(Task task) {
+        if (task.isCompleted()) {
+            removeTask.execute(new DefaultCompleted(), new RemoveTask.Params(String.valueOf(task.getId())));
+            taskList.itemRemoved(task);
+            addTodo(task.getTitle());
         } else {
-            updateTask.execute(new DefaultCompleted(), UpdateTaskCompleted.Params.forTask(String.valueOf(taskItem.getTask().getId())));
-            taskList.itemRemoved(taskItem.getTask());
+            updateTask.execute(new DefaultCompleted(), UpdateTaskCompleted.Params.forTask(String.valueOf(task.getId())));
+            taskList.itemRemoved(task);
         }
     }
 
