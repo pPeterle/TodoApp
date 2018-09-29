@@ -1,74 +1,70 @@
 package com.example.pedro.todoapp.data;
 
-import android.util.Log;
-
+import com.example.pedro.todoapp.data.dao.TaskDao;
 import com.example.pedro.todoapp.data.entity.Task;
-import com.example.pedro.todoapp.data.dao.TasksDao;
-import com.example.pedro.todoapp.domain.repository.TaskRepository;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 
 @Singleton
-public class TaskDataRepository implements TaskRepository {
+public class TaskDataRepository {
 
-    private TasksDao tasksDao;
+    private TaskDao taskDao;
 
     @Inject
-    public TaskDataRepository(TasksDao tasksDao) {
-        this.tasksDao = tasksDao;
+    public TaskDataRepository(TaskDao taskDao) {
+        this.taskDao = taskDao;
     }
 
-    @Override
-    public Completable insertTask(Task task) {
-        return Completable.defer(() -> {
-                tasksDao.insertTask(task);
+    public void insertTask(Task task) {
+        /*return Completable.defer(() -> {
+                taskDao.insertTask(task);
                 return Completable.complete();
-        });
+        });*/
+        taskDao.insertTask(task);
     }
 
-    @Override
     public Completable updateTask(Task task) {
         return Completable.defer(() -> {
-            tasksDao.updateTask(task);
+            taskDao.updateTask(task);
             return Completable.complete();
         });
     }
 
-    @Override
     public Flowable<List<Task>> getAllTasks() {
-        return tasksDao.getAllTasks();
+        return taskDao.getAllTasks();
     }
 
-    @Override
-    public Flowable<List<Task>> getTasksByCompleted(boolean completed) {
-        return tasksDao.getTasksByCompleted(completed);
+    public Flowable<List<Task>> getTasksByTable(int tableId, boolean completed) {
+        return taskDao.getTasksByTable(tableId, completed);
     }
 
-    @Override
     public Flowable<Task> getTaskById(String id) {
-        return tasksDao.getTaskById(id);
+        return taskDao.getTaskById(id);
     }
 
-    @Override
     public Completable updateCompleted(String id, boolean completed) {
         return Completable.defer(() -> {
-            tasksDao.updateCompleted(id, completed);
+            taskDao.updateCompleted(id, completed);
             return Completable.complete();
         });
     }
 
-    @Override
+    public Completable deleteTask(Task task) {
+        return Completable.defer(() -> {
+            taskDao.deleteTask(task);
+            return Completable.complete();
+        });
+    }
+
     public Completable deleteTaskById(String id) {
         return Completable.defer(() -> {
-            tasksDao.deleteTaskById(id);
+            taskDao.deleteTaskById(id);
             return Completable.complete();
         });
     }

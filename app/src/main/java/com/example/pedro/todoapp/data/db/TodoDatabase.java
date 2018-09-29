@@ -1,19 +1,28 @@
 package com.example.pedro.todoapp.data.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import android.content.Context;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.pedro.todoapp.data.dao.TasksDao;
+import android.content.Context;
+import android.util.Log;
+
+import com.example.pedro.todoapp.data.dao.TableDao;
+import com.example.pedro.todoapp.data.dao.TaskDao;
+import com.example.pedro.todoapp.data.entity.Table;
 import com.example.pedro.todoapp.data.entity.Task;
 
-@Database(entities = Task.class, version = 2)
+import java.util.concurrent.Executors;
+
+@Database(entities = {Task.class, Table.class}, version = 30)
 public abstract class TodoDatabase extends RoomDatabase {
 
     private static TodoDatabase INSTANCE;
 
-    public abstract TasksDao tasksDao();
+    public abstract TaskDao tasksDao();
+    public abstract TableDao tableDao();
 
     private static final Object sLock = new Object();
 
@@ -24,6 +33,12 @@ public abstract class TodoDatabase extends RoomDatabase {
                         TodoDatabase.class, "Tasks.db")
                         .fallbackToDestructiveMigration()
                         .allowMainThreadQueries()
+                        .addCallback(new Callback() {
+                            @Override
+                            public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                                Log.i("test", "database criado com sucesso");
+                            }
+                        })
                         .build();
             }
             return INSTANCE;
