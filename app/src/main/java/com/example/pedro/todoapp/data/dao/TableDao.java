@@ -21,8 +21,8 @@ public interface TableDao {
     @Update
     void updateTable(Table table);
 
-    @Delete
-    void deleteTable(Table table);
+    @Query("DELETE FROM `table` WHERE id = :id")
+    void deleteTable(int id);
 
     @Query("SELECT * FROM `table`")
     Flowable<List<Table>> getAllTables();

@@ -35,9 +35,9 @@ public class TableDataRepository {
         });
     }
 
-    public Completable deleteTable(Table table) {
+    public Completable deleteTable(int id) {
         return Completable.defer(() ->{
-            tableDao.deleteTable(table);
+            tableDao.deleteTable(id);
             return Completable.complete();
         });
     }
