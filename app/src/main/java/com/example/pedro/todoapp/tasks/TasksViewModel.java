@@ -40,6 +40,7 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     private TableDataRepository tableDataRepository;
 
     private CompositeDisposable disposable = new CompositeDisposable();
+    private int tableId;
 
     @Inject
     public TasksViewModel(TableDataRepository tableDataRepository, TaskDataRepository taskDataRepository) {
@@ -87,7 +88,7 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     }
 
     private void fetchTasks() {
-        disposable.add(taskDataRepository.getTasksByTable(1, false)
+        disposable.add(taskDataRepository.getTasksByTable(tableId, false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleOnNext));
@@ -102,7 +103,7 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     }
 
     public void addTodo(String text) {
-        taskDataRepository.insertTask(new Task(text, 1, false));
+        taskDataRepository.insertTask(new Task(text, tableId, false));
     }
 
     public LiveData<ViewState<List<Task>>> getViewState() {
@@ -113,5 +114,9 @@ public class TasksViewModel extends ViewModel implements LifecycleObserver {
     protected void onCleared() {
         super.onCleared();
         disposable.dispose();
+    }
+
+    public void setTableId(int tableId) {
+        this.tableId = tableId;
     }
 }

@@ -36,7 +36,7 @@ public class CompletedActivity extends AppCompatActivity {
     private ArrayAdapter<Task> mAdapter;
     private List<Task> mTasksList;
 
-    public static Intent getInstace(Context context, int tableId) {
+    public static Intent newInstace(Context context, int tableId) {
         Intent intent = new Intent(context, CompletedActivity.class);
         intent.putExtra(TABLE_ID_KEY, tableId);
         return intent;

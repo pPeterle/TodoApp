@@ -20,6 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import dagger.android.support.AndroidSupportInjection;
 
 public class TasksFragment extends Fragment {
 
+    private static final String TABLE_ID_KEY = "table_id_key";
+
     private TasksViewModel mViewModel;
 
     private RecyclerView mRecyclerTasks;
@@ -50,8 +53,13 @@ public class TasksFragment extends Fragment {
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
 
-    public static TasksFragment newInstance() {
-        return new TasksFragment();
+    public static TasksFragment newInstance(int tableId) {
+        TasksFragment fragment = new TasksFragment();
+        Bundle args = new Bundle();
+        args.putInt(TABLE_ID_KEY, tableId);
+        fragment.setArguments(args);
+        Log.i("test", "fragment criado com tableId " + tableId);
+        return fragment;
     }
 
     @Override
@@ -80,8 +88,9 @@ public class TasksFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(TasksViewModel.class);
-
+        int tableId = getArguments().getInt(TABLE_ID_KEY);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(TasksViewModel.class);
+        mViewModel.setTableId(tableId);
         getLifecycle().addObserver(mViewModel);
 
         mViewModel.getViewState().observe(this, viewState -> {

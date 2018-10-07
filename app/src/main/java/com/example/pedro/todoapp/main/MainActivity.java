@@ -1,6 +1,5 @@
 package com.example.pedro.todoapp.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -8,13 +7,18 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.pedro.todoapp.R;
+import com.example.pedro.todoapp.ViewModelFactory;
 import com.example.pedro.todoapp.completed.CompletedActivity;
+import com.example.pedro.todoapp.data.entity.Table;
 import com.example.pedro.todoapp.tasks.TasksFragment;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ExpandableDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -22,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProviders;
 import dagger.android.AndroidInjection;
 import dagger.android.DispatchingAndroidInjector;
 
@@ -30,10 +35,14 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
 
+    @Inject
+    ViewModelFactory factory;
+
     private Drawer mDrawer;
     private Toolbar mToolbar;
 
-    private TasksFragment tasksFragment = TasksFragment.newInstance();
+    private MainViewModel mViewModel;
+    private int tableId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +54,30 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         mToolbar.inflateMenu(R.menu.main_menu);
 
+        setupViewModel();
+
         setupDrawer();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+    }
+
+    private void setupViewModel() {
+        mViewModel = ViewModelProviders.of(this, factory).get(MainViewModel.class);
+        getLifecycle().addObserver(mViewModel);
+        mViewModel.getState().observe(this, state -> handleSuccess(state.getData()));
+    }
+
+    private void handleSuccess(List<Table> data) {
+        List<IDrawerItem> list = new ArrayList<>();
+        for (Table table : data) {
+            list.add(new SecondaryDrawerItem()
+                    .withIdentifier(table.getId())
+                    .withName(table.getName()));
+        }
+
+        mDrawer.removeAllItems();
+        mDrawer.addItem(new ExpandableDrawerItem().withName("Projects").withSubItems(list));
     }
 
     public void switchFragment(Fragment fragment) {
@@ -69,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.main_menu_completedTasks:
                 //TODO tornar dinamico o id
-                startActivity(CompletedActivity.getInstace(this, 1));
+                startActivity(CompletedActivity.newInstace(this, tableId));
                 return true;
         }
         return false;
@@ -80,17 +109,13 @@ public class MainActivity extends AppCompatActivity {
         mDrawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
-                .addDrawerItems(new PrimaryDrawerItem().withIdentifier(1).withName("Projects"))
-                .addDrawerItems(new SecondaryDrawerItem().withIdentifier(2).withName("Trabalho"))
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         int id = (int) drawerItem.getIdentifier();
-
-                        switch (id) {
-                            case 2:
-                                switchFragment(tasksFragment);
-                                break;
+                        if (id > 0) {
+                            tableId = id;
+                            switchFragment(TasksFragment.newInstance(id));
                         }
 
                         return false;

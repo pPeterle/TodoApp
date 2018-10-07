@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.pedro.todoapp.ViewModelFactory;
 import com.example.pedro.todoapp.completed.CompletedViewModel;
+import com.example.pedro.todoapp.main.MainViewModel;
 import com.example.pedro.todoapp.tasks.TasksViewModel;
 import com.example.pedro.todoapp.di.ViewModelKey;
 
@@ -27,4 +28,10 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(CompletedViewModel.class)
     public abstract ViewModel bindCompletedViewModel(CompletedViewModel viewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel.class)
+    public abstract ViewModel binMainViewModel(MainViewModel viewModel);
+
 }
