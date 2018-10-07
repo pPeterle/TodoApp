@@ -16,7 +16,7 @@ import com.example.pedro.todoapp.data.entity.Task;
 
 import java.util.concurrent.Executors;
 
-@Database(entities = {Task.class, Table.class}, version = 30)
+@Database(entities = {Task.class, Table.class}, version = 1)
 public abstract class TodoDatabase extends RoomDatabase {
 
     private static TodoDatabase INSTANCE;

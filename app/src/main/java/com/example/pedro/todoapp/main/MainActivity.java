@@ -8,10 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.pedro.todoapp.R;
-import com.example.pedro.todoapp.completedTasks.TaskCompletedActivity;
+import com.example.pedro.todoapp.completed.CompletedActivity;
 import com.example.pedro.todoapp.tasks.TasksFragment;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -70,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_menu_completedTasks:
-                startActivity(new Intent(this, TaskCompletedActivity.class));
+                //TODO tornar dinamico o id
+                startActivity(CompletedActivity.getInstace(this, 1));
                 return true;
         }
         return false;
